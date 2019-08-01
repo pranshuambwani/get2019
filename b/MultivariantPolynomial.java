@@ -16,16 +16,19 @@ public class MultivariantPolynomial {
 	public MultivariantPolynomial(Integer var, Integer array[])
 			throws AssertionError {
 		Integer total = 0;
-		for (int loop = 0; loop < array.length; loop = loop + var + 1) {
-			for (int loop2 = loop + 1; loop2 <= loop + var; loop2++) {
-				if (array[loop2] < 0) {
+		for (int loop = 0; loop < array.length; loop++) {
+
+			if (loop % (var + 1) == 0) {
+				term.add(total);
+				total = 0;
+			} else {
+				if (array[loop] < 0) {
 					throw new AssertionError("Power can't be Negative");
 				}
-				total = total + array[loop2];
+				total = total + array[loop];
 			}
-
 			term.add(total);
-			total = 0;
+
 		}
 	}
 
