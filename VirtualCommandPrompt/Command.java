@@ -231,4 +231,20 @@ public class Command {
 		}
 
 	}
+	
+	private boolean Find(Folder folder, Integer nesting, String folderName) {
+		boolean flag = true;
+		for (Folder subDirectory : folder.getSubfolder()) {
+			for (int loop = 0; loop < nesting; loop++)
+				if (subDirectory.getSubfolder().size() != 0) {
+					if (subDirectory.getFolderName() == folderName) {
+						flag = false;
+					}
+					showTree(subDirectory, nesting + 1);
+				} else if (subDirectory.getFolderName() == folderName) {
+					flag = false;
+				}
+		}
+		return flag;
+	}
 }
