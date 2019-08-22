@@ -198,9 +198,3 @@ SELECT  u.id, u.name, o.amount, o.date_of_order_placed, o.id
  from user as u, orders as o 
 where u.id=o.user_id AND DATEDIFF(CURDATE(), o.date_of_order_placed) <=15;
 
-select i.id,i.order_number,i.status,o.date_of_order_placed
-from item_list i,orders o where o.id=i.order_number and i.status='Shipped'; 
-
-SELECT p.name, p.price, o.date_of_order_placed
-from orders as o, product as p, item_list as i
-where i.order_number=o.id AND i.product_id=p.id AND p.price BETWEEN 20 AND 50;
