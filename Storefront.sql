@@ -116,11 +116,11 @@ select * from product;
 desc image;
 
 insert into image(product_id,image) values
-(1,'C:\Users\User21\Downloads\shirt1.jpg'),
-(3,'C:\Users\User21\Downloads\trouser1.jpg'),
-(5,'C:\Users\User21\Downloads\refrigerator1.jpg'),
-(6,'C:\Users\User21\Downloads\refrigerator2.jpg'),
-(7,'C:\Users\User21\Downloads\mobile1.jpg');
+(1,'shirt1.jpg'),
+(3,'trouser1.jpg'),
+(5,'refrigerator1.jpg'),
+(6,'refrigerator2.jpg'),
+(7,'mobile1.jpg');
 
 select * from image;
 
