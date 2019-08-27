@@ -1,10 +1,6 @@
 package JDBC;
 
-/**
-* This class stores details of a category:
-* name and number of children
-* @author Pranshu
-**/
+
 public class Category {
 
     String name;
