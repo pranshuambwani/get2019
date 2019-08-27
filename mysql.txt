@@ -1,30 +1,56 @@
 1.1.
 
-                 SELECT COUNT(*) FROM orders 
-                 WHERE MONTH(date_of_order_placed) = order_month AND YEAR(date_of_order_placed) = order_year);
+                
+
+			CREATE FUNCTION calculate (order_month INT, order_year INT)
+			RETURNS INT 
+
+			BEGIN
+    
+    			DECLARE orders INT;
+    			SET orders = (SELECT COUNT(*) FROM orders
+ 			WHERE MONTH(date_of_order_placed) = order_month AND YEAR(date_of_order_placed) = order_year);
+
+			RETURN (orders);
+
+
 
 1.2. 
+			CREATE FUNCTION calculate2(order_year INT)
+			RETURNS INT
 
-		 SELECT MONTH(date_of_order_placed) 
-        	 FROM orders
-        	 WHERE YEAR(date_of_order_placed) = order_year
-        	 GROUP BY MONTH(date_of_order_placed) 
-        	 ORDER BY COUNT(id) DESC LIMIT 1;
+			BEGIN
+    
+   		        RETURN (
+			SELECT MONTH(date_of_order_placed) 
+        	 	FROM orders
+        	 	WHERE YEAR(date_of_order_placed) = order_year
+        	 	GROUP BY MONTH(date_of_order_placed) 
+        	 	ORDER BY COUNT(id) DESC LIMIT 1
+			);
+
+
 
 2.1.  
-
-		SELECT p.id, COUNT(l.id)
-    		FROM Product p, orders o, item_list l
-    		WHERE p.id = l.id
-        	AND l.order_number = o.id
-        	AND MONTH(date_of_order_placed) = month
-  		AND YEAR(date_of_order_placed) = year
-    		GROUP BY p.id;
+		
+			CREATE PROCEDURE averageSales
+			(IN month INT, IN year INT)
+			BEGIN			
+			SELECT p.id, COUNT(l.id)
+    			FROM Product p, orders o, item_list l
+    			WHERE p.id = l.id
+        		AND l.order_number = o.id
+        		AND MONTH(date_of_order_placed) = month
+  			AND YEAR(date_of_order_placed) = year
+    			GROUP BY p.id;
 
 
 2.2.
 
 
+		CREATE PROCEDURE order
+		(IN startDate DATE, IN endDate DATE)
+		BEGIN		
 		SELECT o.id, o.amount, l.status
     		FROM orders o, item_list l
 		WHERE date_of_order_placed BETWEEN startDate AND endDate
