@@ -14,6 +14,10 @@ public class MailController {
 	@Autowired
 	public MailSender mail;
 	
+	@Primary
+	@Autowired
+	private MailSender mail;
+	
 	@GetMapping
 	public String getmail(){
 		return mail.send();
