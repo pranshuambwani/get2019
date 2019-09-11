@@ -14,6 +14,10 @@ public class MailController {
 	@Autowired
 	public MailSender mail;
 	
+	@Autowired
+	@Qualifier("mock")
+	public MailSender mail;
+	
 	@Primary
 	@Autowired
 	private MailSender mail;
