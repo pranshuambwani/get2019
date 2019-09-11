@@ -12,23 +12,28 @@ import com.metacube.springIOC.Services.MailSender;
 public class MailController {
 
 	@Autowired
-	public MailSender mail;
-	
-	@Autowired
 	@Qualifier("mock")
 	public MailSender mail;
+
 	
-	@Primary
 	@Autowired
-	private MailSender mail;
+	// setter/  injection 
+	public void setMailSender(@Qualifier("smtpMailSender")MailSender mailSender) {
+		this.mail = mailSender;
+	}
 	
+	 
+	 // for constructor dependency 
+	 @Autowired 
+	 public MailController(@Qualifier("mockMailSender")MailSender mailSender) {
+		 this.mail = mailSender;
+
+	}
+
 	@GetMapping
-	public String getmail(){
+	public String getMail() {
 		return mail.send();
 	}
-	
-	@Autowired
-	public void setmail(MailSender mail){
-		this.mail=mail;
-	}
+
 }
+
