@@ -8,7 +8,7 @@ import java.sql.Statement;
 public class Database {
 	
 	private final String DRIVER = "com.mysql.cj.jdbc.Driver";
-	private final String URL = "jdbc:mysql://localhost:3306/parking_system";
+	private final String URL = "jdbc:mysql://localhost:3306/parkingsystem";
 	private final String USERNAME = "root";
 	private final String PASSWORD = "root";
 	
