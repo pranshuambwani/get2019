@@ -1,8 +1,6 @@
 package com.metacube.EADSession13Assignment.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -11,106 +9,101 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.metacube.EADSession13Assignment.dto.SearchStudentDto;
+import com.metacube.EADSession13Assignment.dto.StudentDto;
+import com.metacube.EADSession13Assignment.entity.StudentEntity;
+import com.metacube.EADSession13Assignment.service.StudentService;
+import com.metacube.EADSession13Assignment.util.DtoUtil;
 
-import com.metacube.EADSession13Assignment.dto.StudentForm;
-import com.metacube.EADSession13Assignment.model.Student;
-import com.metacube.EADSession13Assignment.repository.StudentRepository;
-import com.metacube.EADSession13Assignment.util.DTOUtil;
 
 @Controller
 public class AppController {
 	
-	StudentRepository repository;
-	List<Student> listOfStudents = new ArrayList<>();
-	@Value("${home.notice}")
-	private String notice;
-	
 	@Autowired
-	public AppController(StudentRepository repository) {
-		this.repository = repository;
-	}
+	private StudentService studentObj;
+	
+	@Value("${home.message}")
+	private String message;
+
 	
 	@GetMapping("/login")
-    public String login(Model model, String error, String logout) {
-        if (error != null)
-            model.addAttribute("errorMsg", "Your username and password are invalid.");
-
-        if (logout != null)
-            model.addAttribute("msg", "You have been logged out successfully.");
-
-        return "students/login";
-    }
-
-	@GetMapping("/failurePage")
-	public String showFailurePage()
-	{
-		return "students/failure_page";
+	public String getLogin(Model model , @RequestParam(value="error" , required=false) String error) {
+		model.addAttribute("message" ,message);
+		if(error != null) {
+			model.addAttribute("error" ,"Wrong id password");
+		}
+		return "login";
 	}
 	
-	/**
-	 * Method to show the home page
-	 * @return {String} view name
-	 */
+	
 	@GetMapping("/home")
-	public String showHomePage(Model model)
-	{
-		model.addAttribute("notice", notice);
-		model.addAttribute("message", "Login Succesfull");
-		return "students/home";
-	}
-	
-	/**
-	 * Method to show the Student Entry Form
-	 * @return {String} view name
-	 */
-	@GetMapping("/home/studentForm")
-	public String showUserForm(Model model) 
-	{
-		model.addAttribute(new StudentForm());
-		return "students/student_form"; 
-	}
-	
-	/**
-	 * Method to show the details entered in Student Entry Form
-	 * @return {String} view name
-	 */
-	@PostMapping("/home/studentForm")
-	public String signUp(@Validated StudentForm student, BindingResult result, RedirectAttributes attribute)
-	{
-		if(result.hasErrors())
-		{
-			ObjectError objectError = new ObjectError("form", "Please fill all the details");
-			result.addError(objectError);
-			return "students/student_form";
+	public String getHome(Model model , @RequestParam(value="logged" , required=false) String loggedin ,@RequestParam(value = "denied" , required=false) String denied) {
+		model.addAttribute("message" ,message);
+		if(loggedin != null) {
+			model.addAttribute("loggedin" ,"Welcome User");
+		} 
+		if(denied != null) {
+			model.addAttribute("loggedin" ,"No permission");
 		}
-		else
-		{
-			if(repository.findByEmailContainingIgnoreCase(student.getEmail()).size()!=0)
-			{
-				attribute.addFlashAttribute("message", "Student already exist");
-			}
-			else
-			{
-				repository.save(DTOUtil.map(student, Student.class));
-				attribute.addFlashAttribute("message", "Student added");
-			}
-			return "redirect:/home";
+		return "home";
+	}
+
+	@GetMapping("/showStudent")
+	public String displayStudent(Model model) {
+		model.addAttribute("studentDetails", studentObj.getAll());
+		return "showStudent";
+		
+	}
+	
+
+	@GetMapping("/addstudent")
+	public String AddStudent(Model model) {
+		model.addAttribute("student", new StudentDto());
+		return "addStudent";
+	}
+
+	@PostMapping("/addstudent")
+	public String doSignupByPost(@ModelAttribute("studentCommand") @Validated StudentDto student , BindingResult errorResult , Model model) {
+		if(errorResult.hasErrors()) {
+			ObjectError oe = new  ObjectError("Email","Fill The Form");
+			errorResult.addError(oe);
+			return "addStudent";
+		} else {
+			List<StudentEntity> studentData = studentObj.duplicateEmail(DtoUtil.map(student,StudentEntity.class));
+			if(studentData.size()>0) {
+				
+				model.addAttribute("succes", "Student Email Exit");
+				return "addStudent";
+			} 
+			studentObj.insertData(DtoUtil.map(student,StudentEntity.class));
+			model.addAttribute("succes", "Student Add Succefulyy");
+			return "addStudent";
 		}
 	}
+
+	@GetMapping("/searchStudent") 
+	public String searchStudentByGet(Model model) {
+		model.addAttribute("SearchCommand", new SearchStudentDto());
+		return "Search";
+	}
 	
-	/**
-	 * Method to show the student list
-	 * @return {String} view name
-	 */
-	@GetMapping("/home/showStudents")
-	public String showStudents(Model model)
-	{
-		List<Student> studentList = new ArrayList<>();
-		studentList = repository.findAll();
-		model.addAttribute("students", studentList);
-		return "students/student_list";
+	
+	@PostMapping("/searchStudent") 
+	public String searchStudentByPost(@ModelAttribute("SearchCommand") @Validated SearchStudentDto student , BindingResult errorResult , Model model) {
+		List<StudentEntity> studentData = studentObj.findByID(DtoUtil.map(student,StudentEntity.class));
+		if(studentData.size()>0) {
+			model.addAttribute("studentData", studentData);
+			return "Search";
+		}
+		model.addAttribute("succes", "No Student  Find");
+		return "Search";
+	}
+	
+	@GetMapping("/logout") 
+	public String logout(Model model) {
+		return "redirect:/login";
 	}
 }
